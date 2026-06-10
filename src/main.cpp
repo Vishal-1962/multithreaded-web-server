@@ -1,8 +1,9 @@
-#include <iostream>
-using namespace std;
+#include "../include/Server.h"
+
 int main()
 {
-    cout << "Hello from Multithreaded Web Server Project!" << std::endl;
+    Server server;
+    server.start();
 
     return 0;
 }

@@ -58,17 +58,20 @@ void Server::start()
     }
 
     cout << "Server listening on port 8080..." << endl;
-    cout << "Waiting for client connection..." << endl;
 
-    SOCKET clientSocket =
-        accept(serverSocket, nullptr, nullptr);
+    while (true)
+    {
+        cout << "\nWaiting for client connection..." << endl;
 
-    if (clientSocket == INVALID_SOCKET)
-    {
-        cout << "Accept failed!" << endl;
-    }
-    else
-    {
+        SOCKET clientSocket =
+            accept(serverSocket, nullptr, nullptr);
+
+        if (clientSocket == INVALID_SOCKET)
+        {
+            cout << "Accept failed!" << endl;
+            continue;
+        }
+
         cout << "Client connected!" << endl;
 
         char buffer[4096];

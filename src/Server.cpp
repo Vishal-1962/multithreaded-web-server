@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <winsock2.h>
+#include <cstring>
 
 using namespace std;
 
@@ -60,30 +61,54 @@ void Server::start()
     cout << "Waiting for client connection..." << endl;
 
     SOCKET clientSocket =
-    accept(serverSocket, nullptr, nullptr);
+        accept(serverSocket, nullptr, nullptr);
 
-if (clientSocket == INVALID_SOCKET)
-{
-    cout << "Accept failed!" << endl;
-}
-else
-{
-    cout << "Client connected!" << endl;
-
-    char buffer[4096];
-
-    int bytesReceived =
-        recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
-
-    if (bytesReceived > 0)
+    if (clientSocket == INVALID_SOCKET)
     {
-        buffer[bytesReceived] = '\0';
+        cout << "Accept failed!" << endl;
+    }
+    else
+    {
+        cout << "Client connected!" << endl;
 
-        cout << "\n===== HTTP REQUEST =====\n";
-        cout << buffer << endl;
-        cout << "========================\n";
+        char buffer[4096];
+
+        int bytesReceived =
+            recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
+
+        if (bytesReceived > 0)
+        {
+            buffer[bytesReceived] = '\0';
+
+            cout << "\n===== HTTP REQUEST =====\n";
+            cout << buffer << endl;
+            cout << "========================\n";
+
+            const char* response =
+                "HTTP/1.1 200 OK\r\n"
+                "Content-Type: text/html\r\n"
+                "\r\n"
+                "<html>"
+                "<body>"
+                "<h1>Hello from C++ Web Server!</h1>"
+                "</body>"
+                "</html>";
+
+            send(
+                clientSocket,
+                response,
+                strlen(response),
+                0
+            );
+        }
+        else
+        {
+            cout << "Failed to receive request!" << endl;
+        }
+
+        closesocket(clientSocket);
     }
 
-    closesocket(clientSocket);
-}
+    closesocket(serverSocket);
+    WSACleanup();
 }

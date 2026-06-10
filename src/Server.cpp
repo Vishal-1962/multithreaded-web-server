@@ -60,19 +60,30 @@ void Server::start()
     cout << "Waiting for client connection..." << endl;
 
     SOCKET clientSocket =
-        accept(serverSocket, nullptr, nullptr);
+    accept(serverSocket, nullptr, nullptr);
 
-    if (clientSocket == INVALID_SOCKET)
+if (clientSocket == INVALID_SOCKET)
+{
+    cout << "Accept failed!" << endl;
+}
+else
+{
+    cout << "Client connected!" << endl;
+
+    char buffer[4096];
+
+    int bytesReceived =
+        recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
+
+    if (bytesReceived > 0)
     {
-        cout << "Accept failed!" << endl;
-    }
-    else
-    {
-        cout << "Client connected!" << endl;
+        buffer[bytesReceived] = '\0';
 
-        closesocket(clientSocket);
+        cout << "\n===== HTTP REQUEST =====\n";
+        cout << buffer << endl;
+        cout << "========================\n";
     }
 
-    closesocket(serverSocket);
-    WSACleanup();
+    closesocket(clientSocket);
+}
 }

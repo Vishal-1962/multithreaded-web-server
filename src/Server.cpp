@@ -3,8 +3,45 @@
 #include <iostream>
 #include <winsock2.h>
 #include <cstring>
+#include <thread>
 
 using namespace std;
+
+void Server::handleClient(SOCKET clientSocket)
+{
+    char buffer[4096];
+
+    int bytesReceived =
+        recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
+
+    if (bytesReceived > 0)
+    {
+        buffer[bytesReceived] = '\0';
+
+        cout << "\n===== HTTP REQUEST =====\n";
+        cout << buffer << endl;
+        cout << "========================\n";
+
+        const char* response =
+            "HTTP/1.1 200 OK\r\n"
+            "Content-Type: text/html\r\n"
+            "\r\n"
+            "<html>"
+            "<body>"
+            "<h1>Hello from Multithreaded C++ Web Server!</h1>"
+            "</body>"
+            "</html>";
+
+        send(
+            clientSocket,
+            response,
+            strlen(response),
+            0
+        );
+    }
+
+    closesocket(clientSocket);
+}
 
 void Server::start()
 {
@@ -60,57 +97,28 @@ void Server::start()
     cout << "Server listening on port 8080..." << endl;
 
     while (true)
+{
+    cout << "\nWaiting for client connection..." << endl;
+
+    SOCKET clientSocket =
+        accept(serverSocket, nullptr, nullptr);
+
+    if (clientSocket == INVALID_SOCKET)
     {
-        cout << "\nWaiting for client connection..." << endl;
-
-        SOCKET clientSocket =
-            accept(serverSocket, nullptr, nullptr);
-
-        if (clientSocket == INVALID_SOCKET)
-        {
-            cout << "Accept failed!" << endl;
-            continue;
-        }
-
-        cout << "Client connected!" << endl;
-
-        char buffer[4096];
-
-        int bytesReceived =
-            recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
-
-        if (bytesReceived > 0)
-        {
-            buffer[bytesReceived] = '\0';
-
-            cout << "\n===== HTTP REQUEST =====\n";
-            cout << buffer << endl;
-            cout << "========================\n";
-
-            const char* response =
-                "HTTP/1.1 200 OK\r\n"
-                "Content-Type: text/html\r\n"
-                "\r\n"
-                "<html>"
-                "<body>"
-                "<h1>Hello from C++ Web Server!</h1>"
-                "</body>"
-                "</html>";
-
-            send(
-                clientSocket,
-                response,
-                strlen(response),
-                0
-            );
-        }
-        else
-        {
-            cout << "Failed to receive request!" << endl;
-        }
-
-        closesocket(clientSocket);
+        cout << "Accept failed!" << endl;
+        continue;
     }
+
+    cout << "Client connected!" << endl;
+
+    std::thread clientThread(
+        &Server::handleClient,
+        this,
+        clientSocket
+    );
+
+    clientThread.detach();
+}
 
     closesocket(serverSocket);
     WSACleanup();

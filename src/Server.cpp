@@ -1,5 +1,6 @@
 #include "../include/Server.h"
 #include "../include/HttpParser.h"
+#include "../include/FileManager.h"
 
 #include <iostream>
 #include <winsock2.h>
@@ -34,32 +35,19 @@ void Server::handleClient(SOCKET clientSocket)
 
         std::string html;
 
+std::string filePath;
+
 if (path == "/")
 {
-    html =
-        "<html>"
-        "<body>"
-        "<h1>Home Page</h1>"
-        "</body>"
-        "</html>";
+    filePath = "pages/index.html";
 }
 else if (path == "/about")
 {
-    html =
-        "<html>"
-        "<body>"
-        "<h1>About Page</h1>"
-        "</body>"
-        "</html>";
+    filePath = "pages/about.html";
 }
 else if (path == "/contact")
 {
-    html =
-        "<html>"
-        "<body>"
-        "<h1>Contact Page</h1>"
-        "</body>"
-        "</html>";
+    filePath = "pages/contact.html";
 }
 else
 {
@@ -71,8 +59,32 @@ else
         "</html>";
 }
 
+if (!filePath.empty())
+{
+    html = FileManager::readFile(filePath);
+}
+
+if (html.empty())
+{
+    html =
+        "<html>"
+        "<body>"
+        "<h1>File Not Found</h1>"
+        "</body>"
+        "</html>";
+}
+
+std::string statusLine = "HTTP/1.1 200 OK\r\n";
+
+if (path != "/" &&
+    path != "/about" &&
+    path != "/contact")
+{
+    statusLine = "HTTP/1.1 404 Not Found\r\n";
+}
+
 std::string response =
-    "HTTP/1.1 200 OK\r\n"
+    statusLine +
     "Content-Type: text/html\r\n"
     "\r\n" +
     html;

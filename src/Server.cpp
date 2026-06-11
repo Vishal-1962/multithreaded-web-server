@@ -1,4 +1,5 @@
 #include "../include/Server.h"
+#include "../include/HttpParser.h"
 
 #include <iostream>
 #include <winsock2.h>
@@ -22,22 +23,66 @@ void Server::handleClient(SOCKET clientSocket)
         cout << buffer << endl;
         cout << "========================\n";
 
-        const char* response =
-            "HTTP/1.1 200 OK\r\n"
-            "Content-Type: text/html\r\n"
-            "\r\n"
-            "<html>"
-            "<body>"
-            "<h1>Hello from Multithreaded C++ Web Server!</h1>"
-            "</body>"
-            "</html>";
+        std::string request(buffer);
 
-        send(
-            clientSocket,
-            response,
-            strlen(response),
-            0
-        );
+        std::string path =
+        HttpParser::getPath(request);
+
+        cout << "Requested Path: "
+             << path
+             << endl;
+
+        std::string html;
+
+if (path == "/")
+{
+    html =
+        "<html>"
+        "<body>"
+        "<h1>Home Page</h1>"
+        "</body>"
+        "</html>";
+}
+else if (path == "/about")
+{
+    html =
+        "<html>"
+        "<body>"
+        "<h1>About Page</h1>"
+        "</body>"
+        "</html>";
+}
+else if (path == "/contact")
+{
+    html =
+        "<html>"
+        "<body>"
+        "<h1>Contact Page</h1>"
+        "</body>"
+        "</html>";
+}
+else
+{
+    html =
+        "<html>"
+        "<body>"
+        "<h1>404 Not Found</h1>"
+        "</body>"
+        "</html>";
+}
+
+std::string response =
+    "HTTP/1.1 200 OK\r\n"
+    "Content-Type: text/html\r\n"
+    "\r\n" +
+    html;
+
+send(
+    clientSocket,
+    response.c_str(),
+    response.length(),
+    0
+);
     }
 
     closesocket(clientSocket);

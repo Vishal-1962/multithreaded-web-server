@@ -32,3 +32,19 @@ A lightweight multithreaded HTTP web server built from scratch using C++ and Win
 
 ```bash
 g++ -std=c++17 src/main.cpp src/Server.cpp src/HttpParser.cpp src/FileManager.cpp -o server.exe -lws2_32
+
+## Screenshots
+
+### Home Page
+![Home](assets/homepage.jpg)
+
+### About Page
+![About](assets/aboutpage.jpg)
+
+### Contact Page
+![Contact](assets/contactpage.jpg)
+
+### 404 Page
+![404](assets/notfoundpage.jpg)
+
+

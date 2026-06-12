@@ -49,6 +49,10 @@ else if (path == "/contact")
 {
     filePath = "pages/contact.html";
 }
+else if (path == "/style.css")
+{
+    filePath = "pages/style.css";
+}
 else
 {
     html =
@@ -83,9 +87,16 @@ if (path != "/" &&
     statusLine = "HTTP/1.1 404 Not Found\r\n";
 }
 
+std::string contentType = "text/html";
+
+if (path == "/style.css")
+{
+    contentType = "text/css";
+}
+
 std::string response =
     statusLine +
-    "Content-Type: text/html\r\n"
+    "Content-Type: " + contentType + "\r\n"
     "\r\n" +
     html;
 
